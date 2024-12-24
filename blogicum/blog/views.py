@@ -25,7 +25,7 @@ class PostListView(ListView):
             pub_date__lte=Now(),
             category__is_published=True
         ).select_related('author').prefetch_related(
-            'category', 'location').annotate(
+            'category', 'location').order_by('-pub_date').annotate(
                 comment_count=Count('comments')
         )
 
@@ -94,7 +94,6 @@ class PostDetailView(DetailView):
         if (
             post.author == self.request.user
             or (post.is_published and post.category.is_published
-                and post.pub_date <= Now()
                 )
         ):
 
@@ -216,7 +215,7 @@ class ProfileView(ListView):
         posts = Post.objects.filter(author=profile).select_related(
             'author').prefetch_related('comments', 'category', 'location')
         posts_annotated = posts.annotate(comment_count=Count('comments'))
-        return posts_annotated
+        return posts_annotated.order_by('-pub_date')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
