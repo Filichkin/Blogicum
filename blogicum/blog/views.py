@@ -1,8 +1,28 @@
+from django.views.generic import ListView
 from django.shortcuts import render, get_object_or_404
 from django.db.models.functions import Now
+from django.db.models import Count
 
 from .models import Post, Category
 from .constants import MAX_POSTS
+
+
+class PostListView(ListView):
+    model = Post
+    paginate_by = MAX_POSTS
+    template_name = 'blog/index.html'
+
+    def get_queryset(self):
+        queryset = Post.objects.filter(
+            is_published=True,
+            pub_date__lte=Now(),
+            category__is_published=True
+        ).select_related('author').prefetch_related(
+            'category', 'location').annotate(
+                comment_count=Count('comments')
+        )
+
+        return queryset
 
 
 def get_posts(post_objects):
