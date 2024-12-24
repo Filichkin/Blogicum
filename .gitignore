@@ -150,3 +150,6 @@ media/
 
 sent_emails/
 
+# файл базы данных
+
+db.json
