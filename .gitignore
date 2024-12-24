@@ -155,3 +155,5 @@ sent_emails/
 db.json
 
 config.py
+
+sent_emails/
