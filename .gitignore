@@ -153,3 +153,5 @@ sent_emails/
 # файл базы данных
 
 db.json
+
+config.py
