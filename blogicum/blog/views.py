@@ -126,7 +126,8 @@ class CategoryPostsView(ListView):
             is_published=True,
             pub_date__lte=Now(),
             category=self.category
-        ).select_related('author', 'category', 'location')
+        ).select_related('author', 'category', 'location'
+                         ).order_by('-pub_date')
 
         queryset = queryset.annotate(comment_count=Count('comments'))
         queryset = queryset.filter(category__is_published=True)
