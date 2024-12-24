@@ -25,6 +25,61 @@ class PostListView(ListView):
         return queryset
 
 
+class PostDetailView(DetailView):
+    model = Post
+    template_name = 'blog/detail.html'
+
+    def get_object(self, queryset=None):
+        post_id = self.kwargs.get('post_id')
+        post = get_object_or_404(Post, id=post_id)
+        if (
+            post.author == self.request.user
+            or (post.is_published and post.category.is_published
+                and post.pub_date <= timezone.now())
+        ):
+
+            return post
+        raise Http404('Страница не найдена')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        post = self.get_object()
+        comments = post.comments.all().order_by('created_at')
+        context['form'] = CommentForm()
+        context['comments'] = comments
+
+        return context
+
+
+class CategoryPostsView(ListView):
+    model = Post
+    paginate_by = MAX_POSTS
+    template_name = 'blog/category.html'
+
+    def get_queryset(self):
+        self.category = get_object_or_404(
+            Category,
+            slug=self.kwargs['category_slug'],
+            is_published=True
+        )
+
+        queryset = Post.objects.filter(
+            is_published=True,
+            pub_date__lte=Now(),
+            category=self.category
+        ).select_related('author', 'category', 'location')
+
+        queryset = queryset.annotate(comment_count=Count('comments'))
+        queryset = queryset.filter(category__is_published=True)
+
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['category'] = self.category
+        return context
+
+
 def get_posts(post_objects):
     """Посты из БД по условиям ТЗ."""
     return post_objects.filter(
