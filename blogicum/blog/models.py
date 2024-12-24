@@ -88,6 +88,12 @@ class Post(PublishedModel):
         verbose_name='Категория',
         related_name='posts'
     )
+    image = models.ImageField(
+        upload_to='posts_images',
+        null=True,
+        blank=True,
+        verbose_name='Фото к постам'
+    )
 
     class Meta:
         ordering = ['-pub_date']
