@@ -15,6 +15,13 @@ from .constants import MAX_POSTS
 from .utils import posts_queryset
 
 
+class OnlyAuthorMixin(UserPassesTestMixin):
+
+    def test_func(self):
+        object = self.get_object()
+        return object.author == self.request.user
+
+
 class PostListView(ListView):
     model = Post
     paginate_by = MAX_POSTS
@@ -41,15 +48,11 @@ class PostCreateView(LoginRequiredMixin, CreateView):
         return reverse('blog:profile', args=[username])
 
 
-class PostUpdateView(UserPassesTestMixin, UpdateView):
+class PostUpdateView(OnlyAuthorMixin, UpdateView):
     model = Post
     form_class = PostForm
     template_name = 'blog/create.html'
     pk_url_kwarg = 'post_id'
-
-    def test_func(self):
-        object = self.get_object()
-        return object.author == self.request.user
 
     def handle_no_permission(self):
         if not self.test_func():
@@ -63,15 +66,11 @@ class PostUpdateView(UserPassesTestMixin, UpdateView):
         )
 
 
-class PostDeleteView(LoginRequiredMixin, DeleteView):
+class PostDeleteView(OnlyAuthorMixin, DeleteView):
     model = Post
     template_name = 'blog/create.html'
     success_url = reverse_lazy('blog:index')
     pk_url_kwarg = 'post_id'
-
-    def get_queryset(self):
-        qs = super().get_queryset()
-        return qs.filter(author=self.request.user)
 
 
 class PostDetailView(DetailView):
