@@ -4,7 +4,6 @@ from django.shortcuts import get_object_or_404, redirect
 from django.http import Http404
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.models import User
-from django.db.models.functions import Now
 from django.core.exceptions import PermissionDenied
 from django.db.models import Count
 from django.urls import reverse_lazy, reverse
@@ -80,11 +79,8 @@ class PostDetailView(DetailView):
     def get_object(self, queryset=None):
         post_id = self.kwargs.get('post_id')
         post = get_object_or_404(Post, id=post_id)
-        if (
-            post.author == self.request.user
-            or (post.is_published and post.category.is_published
-                )
-        ):
+        if (post.author == self.request.user or (post.is_published
+           and post.category.is_published)):
 
             return post
         raise Http404('Страница не найдена')
@@ -104,28 +100,19 @@ class CategoryPostsView(ListView):
     paginate_by = MAX_POSTS
     template_name = 'blog/category.html'
 
-    def get_queryset(self):
-        self.category = get_object_or_404(
-            Category,
-            slug=self.kwargs['category_slug'],
+    def get_category(self, **kwargs):
+        return get_object_or_404(
+            Category, slug=self.kwargs['category_slug'],
             is_published=True
         )
 
-        queryset = Post.objects.filter(
-            is_published=True,
-            pub_date__lte=Now(),
-            category=self.category
-        ).select_related('author', 'category', 'location'
-                         ).order_by('-pub_date')
-
-        queryset = queryset.annotate(comment_count=Count('comments'))
-        queryset = queryset.filter(category__is_published=True)
-
-        return queryset
+    def get_queryset(self):
+        return (posts_queryset(Post.objects
+                               ).filter(category=self.get_category()))
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['category'] = self.category
+        context['category'] = self.get_category()
         return context
 
 
