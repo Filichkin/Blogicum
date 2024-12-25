@@ -2,36 +2,16 @@ from django.views.generic import ListView, CreateView
 from django.views.generic import UpdateView, DeleteView, DetailView
 from django.shortcuts import get_object_or_404, redirect
 from django.http import Http404
-from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
-from django.core.exceptions import PermissionDenied
 from django.db.models import Count
 from django.urls import reverse_lazy, reverse
 
-from .forms import CommentForm, PostForm, UserProfileForm
-from .models import Post, Category, Comment
 from .constants import MAX_POSTS
-from .utils import posts_queryset
-
-
-class OnlyAuthorMixin(UserPassesTestMixin):
-
-    def test_func(self):
-        object = self.get_object()
-        return object.author == self.request.user
-
-
-class CommentMixin(LoginRequiredMixin):
-    model = Comment
-    template_name = 'blog/comment.html'
-
-    def dispatch(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        if self.object.author != request.user:
-            raise PermissionDenied(
-                'Вы не авторизованы для удаления этого комментария.'
-            )
-        return super().dispatch(request, *args, **kwargs)
+from .forms import CommentForm, PostForm, UserProfileForm
+from .mixins import CommentMixin, OnlyAuthorMixin
+from .models import Post, Category, Comment
+from .utils import get_user, posts_queryset
 
 
 class PostListView(ListView):
@@ -167,9 +147,6 @@ class DeleteCommentView(CommentMixin, DeleteView):
         post_id = self.kwargs.get('post_id')
         return reverse_lazy('blog:post_detail', kwargs={'post_id': post_id})
 
-    def post(self, request, *args, **kwargs):
-        return self.delete(request, *args, **kwargs)
-
 
 class ProfileView(ListView):
     model = Post
@@ -177,11 +154,7 @@ class ProfileView(ListView):
     paginate_by = MAX_POSTS
 
     def get_queryset(self):
-        username = self.kwargs['username']
-        profile = get_object_or_404(
-            User,
-            username=username
-        )
+        profile = get_user(self.kwargs.get('username'))
         posts = Post.objects.filter(author=profile).select_related(
             'author').prefetch_related('comments', 'category', 'location')
         posts_annotated = posts.annotate(comment_count=Count('comments'))
@@ -190,8 +163,7 @@ class ProfileView(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         if 'profile' not in context:
-            context['profile'] = get_object_or_404(
-                User, username=self.kwargs['username'])
+            context['profile'] = get_user(self.kwargs.get('username'))
         return context
 
 

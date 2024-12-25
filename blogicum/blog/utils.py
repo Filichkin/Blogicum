@@ -1,5 +1,8 @@
 from django.db.models.functions import Now
+from django.shortcuts import get_object_or_404
 from django.db.models import Count
+
+from .models import User
 
 
 def posts_queryset(objects_manager):
@@ -12,3 +15,7 @@ def posts_queryset(objects_manager):
             comment_count=Count('comments')
     )
     return queryset
+
+
+def get_user(username):
+    return get_object_or_404(User, username=username)
