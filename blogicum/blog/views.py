@@ -12,6 +12,7 @@ from django.urls import reverse_lazy, reverse
 from .forms import CommentForm, PostForm, UserProfileForm
 from .models import Post, Category, Comment
 from .constants import MAX_POSTS
+from .utils import posts_queryset
 
 
 class PostListView(ListView):
@@ -20,14 +21,7 @@ class PostListView(ListView):
     template_name = 'blog/index.html'
 
     def get_queryset(self):
-        queryset = Post.objects.filter(
-            is_published=True,
-            pub_date__lte=Now(),
-            category__is_published=True
-        ).select_related('author').prefetch_related(
-            'category', 'location').order_by('-pub_date').annotate(
-                comment_count=Count('comments')
-        )
+        queryset = posts_queryset(Post.objects)
 
         return queryset
 
