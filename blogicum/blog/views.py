@@ -21,6 +21,19 @@ class OnlyAuthorMixin(UserPassesTestMixin):
         return object.author == self.request.user
 
 
+class CommentMixin(LoginRequiredMixin):
+    model = Comment
+    template_name = 'blog/comment.html'
+
+    def dispatch(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        if self.object.author != request.user:
+            raise PermissionDenied(
+                'Вы не авторизованы для удаления этого комментария.'
+            )
+        return super().dispatch(request, *args, **kwargs)
+
+
 class PostListView(ListView):
     model = Post
     paginate_by = MAX_POSTS
@@ -133,19 +146,9 @@ class AddCommentView(LoginRequiredMixin, CreateView):
         return super().form_valid(form)
 
 
-class EditCommentView(LoginRequiredMixin, UpdateView):
-    model = Comment
+class EditCommentView(CommentMixin, UpdateView):
     form_class = CommentForm
-    template_name = 'blog/comment.html'
     success_url = reverse_lazy('blog:index')
-
-    def dispatch(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        if self.object.author != request.user:
-            raise PermissionDenied(
-                'Вы не авторизованы для редактирования этого комментария.'
-            )
-        return super().dispatch(request, *args, **kwargs)
 
     def get_object(self, queryset=None):
         comment_id = self.kwargs.get('comment_id')
@@ -157,18 +160,8 @@ class EditCommentView(LoginRequiredMixin, UpdateView):
         return context
 
 
-class DeleteCommentView(LoginRequiredMixin, DeleteView):
-    model = Comment
-    template_name = 'blog/comment.html'
+class DeleteCommentView(CommentMixin, DeleteView):
     pk_url_kwarg = 'comment_id'
-
-    def dispatch(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        if self.object.author != request.user:
-            raise PermissionDenied(
-                'Вы не авторизованы для удаления этого комментария.'
-            )
-        return super().dispatch(request, *args, **kwargs)
 
     def get_success_url(self):
         post_id = self.kwargs.get('post_id')
