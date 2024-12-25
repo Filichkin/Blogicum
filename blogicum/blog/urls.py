@@ -12,11 +12,11 @@ urlpatterns = [
         views.PostDetailView.as_view(),
         name='post_detail'),
     path(
-        'posts/<int:pk>/edit/',
+        'posts/<int:post_id>/edit/',
         views.PostUpdateView.as_view(),
         name='edit_post'),
     path(
-        'posts/<post_id>/delete/',
+        'posts/<int:post_id>/delete/',
         views.PostDeleteView.as_view(),
         name='delete_post'),
     path(
@@ -36,14 +36,14 @@ urlpatterns = [
         views.EditProfileView.as_view(),
         name='edit_profile'),
     path(
-        'posts/<post_id>/comment/',
+        'posts/<int:post_id>/comment/',
         views.AddCommentView.as_view(),
         name='add_comment'),
     path(
-        'posts/<post_id>/edit_comment/<comment_id>/',
+        'posts/<int:post_id>/edit_comment/<comment_id>/',
         views.EditCommentView.as_view(),
         name='edit_comment'),
     path(
-        'posts/<post_id>/delete_comment/<comment_id>/',
+        'posts/<int:post_id>/delete_comment/<comment_id>/',
         views.DeleteCommentView.as_view(), name='delete_comment'),
 ]
