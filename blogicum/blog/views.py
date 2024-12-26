@@ -10,7 +10,7 @@ from .constants import MAX_POSTS
 from .forms import CommentForm, PostForm, UserProfileForm
 from .mixins import CommentMixin, OnlyAuthorMixin
 from .models import Post, Category, Comment
-from .utils import get_user, posts_queryset
+from .utils import get_user, get_user_posts, posts_queryset
 
 
 class PostListView(ListView):
@@ -161,7 +161,7 @@ class ProfileView(ListView):
 
     def get_queryset(self):
         profile = get_user(self.kwargs.get('username'))
-        return posts_queryset(profile.posts.all())
+        return get_user_posts(profile)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
