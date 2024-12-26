@@ -2,7 +2,7 @@ from django.db.models.functions import Now
 from django.shortcuts import get_object_or_404
 from django.db.models import Count
 
-from .models import Post, User
+from .models import User
 
 
 def posts_queryset(objects_manager):
@@ -20,10 +20,9 @@ def posts_queryset(objects_manager):
     )
 
 
-def get_user_posts(user):
+def get_user_posts(objects_manager):
     return (
-        Post.objects
-        .filter(author=user)
+        objects_manager
         .select_related('author')
         .prefetch_related('category', 'location')
         .order_by('-pub_date')
