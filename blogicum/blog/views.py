@@ -20,9 +20,7 @@ class PostListView(ListView):
     template_name = 'blog/index.html'
 
     def get_queryset(self):
-        queryset = posts_queryset(Post.objects)
-
-        return queryset
+        return posts_queryset(Post.objects)
 
 
 class PostCreateView(LoginRequiredMixin, CreateView):
@@ -61,8 +59,19 @@ class PostUpdateView(OnlyAuthorMixin, UpdateView):
 class PostDeleteView(OnlyAuthorMixin, DeleteView):
     model = Post
     template_name = 'blog/create.html'
-    success_url = reverse_lazy('blog:index')
     pk_url_kwarg = 'post_id'
+    context_object_name = 'form'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        form = PostForm(instance=self.get_object())
+        context['form'] = form
+        return context
+
+    def get_success_url(self):
+        return reverse_lazy(
+            'blog:index'
+        )
 
 
 class PostDetailView(DetailView):
