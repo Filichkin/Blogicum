@@ -4,7 +4,6 @@ from django.shortcuts import get_object_or_404, redirect
 from django.http import Http404
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
-from django.db.models import Count
 from django.urls import reverse_lazy, reverse
 
 from .constants import MAX_POSTS
@@ -109,8 +108,7 @@ class CategoryPostsView(ListView):
         )
 
     def get_queryset(self):
-        return (posts_queryset(Post.objects
-                               ).filter(category=self.get_category()))
+        return posts_queryset(self.get_category().posts.all())
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -163,10 +161,7 @@ class ProfileView(ListView):
 
     def get_queryset(self):
         profile = get_user(self.kwargs.get('username'))
-        posts = Post.objects.filter(author=profile).select_related(
-            'author').prefetch_related('comments', 'category', 'location')
-        posts_annotated = posts.annotate(comment_count=Count('comments'))
-        return posts_annotated.order_by('-pub_date')
+        return posts_queryset(profile.posts.all())
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
