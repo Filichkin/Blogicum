@@ -112,7 +112,6 @@ class CategoryPostsView(ListView):
 class AddCommentView(LoginRequiredMixin, CreateView):
     model = Comment
     form_class = CommentForm
-    template_name = 'comments.html'
 
     def get_success_url(self):
         post_id = self.kwargs.get('post_id')
