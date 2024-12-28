@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth import get_user_model
+from django.conf import settings
 
 from core.models import PublishedModel
 from .constants import MAX_LENGTH
@@ -93,6 +94,11 @@ class Post(PublishedModel):
         null=True,
         blank=True,
         verbose_name='Фото к постам'
+    )
+    users_like = models.ManyToManyField(
+        settings.AUTH_USER_MODEL,
+        related_name='images_liked',
+        blank=True
     )
 
     class Meta:
