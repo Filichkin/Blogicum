@@ -108,7 +108,7 @@ class CategoryPostsView(ListView):
         )
 
     def get_queryset(self):
-        return posts_queryset(self.get_category().posts.all())
+        return posts_queryset(self.get_category().posts)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -161,7 +161,7 @@ class ProfileView(ListView):
 
     def get_queryset(self):
         profile = get_user(self.kwargs.get('username'))
-        return get_user_posts(profile.posts.all())
+        return get_user_posts(profile.posts)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
