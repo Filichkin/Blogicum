@@ -26,6 +26,25 @@
           </small>
         </h6>
         <p class="card-text">{{ post.text|linebreaksbr }}</p>
+        
+        {% with total_likes=post.users_like.count users_like=post.users_like.all %}
+        <div>
+          <span class="count">
+          <span class="total">{{ total_likes }}</span>
+          like{{ total_likes|pluralize }}
+          </span>
+          {% if request.user.is_authenticated %}
+            <a href="#" data-id="{{ post.id }}" data-action="{% if request.user in users_like %}un{% endif %}like" class="like button">
+            {% if request.user not in users_like %}
+              Like
+            {% else %}
+              Unlike
+            {% endif %}
+            </a>
+          {% endif %}
+        </div>
+      {% endwith %}
+        
         {% if user == post.author %}
           <div class="mb-2">
             <a class="btn btn-sm text-muted" href="{% url 'blog:edit_post' post.id %}" role="button">
@@ -40,4 +59,46 @@
       </div>
     </div>
   </div>
+{% endblock %}
+
+{% block domready %}
+      const url = '{% url "blog:like" %}';
+      
+      var options = {
+        method: 'POST',
+        headers: {'X-CSRFToken': csrftoken},
+        mode: 'same-origin'
+    }
+
+    document.querySelector('a.like')
+          .addEventListener('click', function(e){
+    e.preventDefault();
+    var likeButton = this;
+
+    // add request body
+    var formData = new FormData();
+    formData.append('id', likeButton.dataset.id);
+    formData.append('action', likeButton.dataset.action);
+    options['body'] = formData;
+
+    // send HTTP request
+    fetch(url, options)
+    .then(response => response.json())
+    .then(data => {
+      if (data['status'] === 'ok')
+      {
+        var previousAction = likeButton.dataset.action;
+
+        // toggle button text and data-action
+        var action = previousAction === 'like' ? 'unlike' : 'like';
+        likeButton.dataset.action = action;
+        likeButton.innerHTML = action;
+
+        // update like count
+        var likeCount = document.querySelector('span.count .total');
+        var totalLikes = parseInt(likeCount.innerHTML);
+        likeCount.innerHTML = previousAction === 'like' ? totalLikes + 1 : totalLikes - 1;
+      }
+    })
+  });
 {% endblock %}

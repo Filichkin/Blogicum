@@ -1,10 +1,12 @@
 from django.views.generic import ListView, CreateView
 from django.views.generic import UpdateView, DeleteView, DetailView
 from django.shortcuts import get_object_or_404, redirect
-from django.http import Http404
+from django.http import Http404, JsonResponse
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
 from django.urls import reverse_lazy, reverse
+from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_POST
 
 from .constants import MAX_POSTS
 from .forms import CommentForm, PostForm, UserProfileForm
@@ -82,7 +84,6 @@ class PostDetailView(DetailView):
         post = get_object_or_404(Post, id=post_id)
         if (post.author == self.request.user or (post.is_published
            and post.category.is_published)):
-
             return post
         raise Http404('Страница не найдена')
 
@@ -92,7 +93,6 @@ class PostDetailView(DetailView):
         comments = post.comments.all().order_by('created_at')
         context['form'] = CommentForm()
         context['comments'] = comments
-
         return context
 
 
@@ -183,3 +183,20 @@ class EditProfileView(LoginRequiredMixin, UpdateView):
 
     def get_object(self):
         return self.request.user
+
+
+@require_POST
+def post_like(request):
+    post_id = request.POST.get('id')
+    action = request.POST.get('action')
+    if post_id and action:
+        try:
+            post = Post.objects.get(id=post_id)
+            if action == 'like':
+                post.users_like.add(request.user)
+            else:
+                post.users_like.remove(request.user)
+            return JsonResponse({'status': 'ok'})
+        except Post.DoesNotExist:
+            pass
+    return JsonResponse({'status': 'error'})

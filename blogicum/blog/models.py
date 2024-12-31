@@ -96,8 +96,8 @@ class Post(PublishedModel):
         verbose_name='Фото к постам'
     )
     users_like = models.ManyToManyField(
-        settings.AUTH_USER_MODEL,
-        related_name='images_liked',
+        User,
+        related_name='posts_liked',
         blank=True
     )
 

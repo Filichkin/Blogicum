@@ -1,6 +1,7 @@
 from django.urls import path
 
 from . import views
+from .views import PostDetailView
 
 
 app_name = 'blog'
@@ -46,4 +47,5 @@ urlpatterns = [
     path(
         'posts/<int:post_id>/delete_comment/<comment_id>/',
         views.DeleteCommentView.as_view(), name='delete_comment'),
+    path('posts/like/', views.post_like, name='like'),
 ]

@@ -18,9 +18,20 @@
     {% include "includes/header.html" %}
     <main>
       <div class="container py-5">
-        {% block content %}{% endblock %}
+        {% block content %}
+        {% endblock %}
       </div>
+      
     </main>
     {% include "includes/footer.html" %}
+
+    <script src="//cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js"></script>
+      <script>
+        const csrftoken = Cookies.get('csrftoken');
+        document.addEventListener('DOMContentLoaded', (event) => {
+          {% block domready %}
+          {% endblock %}
+        })
+      </script>
   </body>
 </html>
