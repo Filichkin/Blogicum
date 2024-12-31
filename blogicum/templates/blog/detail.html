@@ -29,8 +29,8 @@
         
         {% with total_likes=post.users_like.count users_like=post.users_like.all %}
         <div>
-          <span class="count">
-          <span class="total">{{ total_likes }}</span>
+          <span class="count" hidden>
+          <span class="total" hidden>{{ total_likes }}</span>
           like{{ total_likes|pluralize }}
           </span>
           {% if request.user.is_authenticated %}
