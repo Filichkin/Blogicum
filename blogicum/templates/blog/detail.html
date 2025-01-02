@@ -26,11 +26,11 @@
           </small>
         </h6>
         <p class="card-text">{{ post.text|linebreaksbr }}</p>
-        
+
         {% with total_likes=post.users_like.count users_like=post.users_like.all %}
         <div>
-          <span class="count" hidden>
-          <span class="total" hidden>{{ total_likes }}</span>
+          <span class="count">
+          <span class="total">{{ total_likes }}</span>
           like{{ total_likes|pluralize }}
           </span>
           {% if request.user.is_authenticated %}
@@ -62,43 +62,43 @@
 {% endblock %}
 
 {% block domready %}
-      const url = '{% url "blog:like" %}';
+          const url = '{% url "blog:like" %}';
       
-      var options = {
-        method: 'POST',
-        headers: {'X-CSRFToken': csrftoken},
-        mode: 'same-origin'
-    }
+          var options = {
+            method: 'POST',
+            headers: {'X-CSRFToken': csrftoken},
+            mode: 'same-origin'
+          }
 
-    document.querySelector('a.like')
-          .addEventListener('click', function(e){
-    e.preventDefault();
-    var likeButton = this;
+          document.querySelector('a.like')
+            .addEventListener('click', function(e){
+            e.preventDefault();
+            var likeButton = this;
 
-    // add request body
-    var formData = new FormData();
-    formData.append('id', likeButton.dataset.id);
-    formData.append('action', likeButton.dataset.action);
-    options['body'] = formData;
+            // add request body
+            var formData = new FormData();
+            formData.append('id', likeButton.dataset.id);
+            formData.append('action', likeButton.dataset.action);
+            options['body'] = formData;
 
-    // send HTTP request
-    fetch(url, options)
-    .then(response => response.json())
-    .then(data => {
-      if (data['status'] === 'ok')
-      {
-        var previousAction = likeButton.dataset.action;
+            // send HTTP request
+            fetch(url, options)
+              .then(response => response.json())
+              .then(data => {
+            if (data['status'] === 'ok')
+            {
+              var previousAction = likeButton.dataset.action;
 
-        // toggle button text and data-action
-        var action = previousAction === 'like' ? 'unlike' : 'like';
-        likeButton.dataset.action = action;
-        likeButton.innerHTML = action;
+            // toggle button text and data-action
+            var action = previousAction === 'like' ? 'unlike' : 'like';
+            likeButton.dataset.action = action;
+            likeButton.innerHTML = action;
 
-        // update like count
-        var likeCount = document.querySelector('span.count .total');
-        var totalLikes = parseInt(likeCount.innerHTML);
-        likeCount.innerHTML = previousAction === 'like' ? totalLikes + 1 : totalLikes - 1;
-      }
-    })
-  });
-{% endblock %}
+            // update like count
+            var likeCount = document.querySelector('span.count .total');
+            var totalLikes = parseInt(likeCount.innerHTML);
+            likeCount.innerHTML = previousAction === 'like' ? totalLikes + 1 : totalLikes - 1;
+            }
+          })
+        });
+ {% endblock %}

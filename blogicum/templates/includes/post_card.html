@@ -22,25 +22,69 @@
       <p class="card-text">{{ post.text|truncatewords:10 }}</p>
       <a href="{% url 'blog:post_detail' post.id %}" class="card-link">Читать полный текст</a>
       <a href="{% url 'blog:post_detail' post.id %}" class="card-link text-muted">Комментарии ({{ post.comment_count }})</a>
-      {% with total_likes=post.users_like.count %}
-      <div>
-        <h5>
-          <span class="badge text-bg-light">
-            {{ total_likes }} 
-            like{{ total_likes|pluralize }}
-          </span>
-        </h5>  
-      </div>
-      {% endwith %}
-        
       
+      {% with total_likes=post.users_like.count users_like=post.users_like.all %}
+        <div>
+          <span class="count">
+          <span class="total">{{ total_likes }}</span>
+          like{{ total_likes|pluralize }}
+          </span>
+          {% if request.user.is_authenticated %}
+            <a href="#" data-id="{{ post.id }}" data-action="{% if request.user in users_like %}un{% endif %}like" class="like button">
+            {% if request.user not in users_like %}
+              Like
+            {% else %}
+              Unlike
+            {% endif %}
+            </a>
+          {% endif %}
+        </div>
+      {% endwith %}
     </div>
   </div>
 </div>
+<script src="//cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js"></script>
+      <script>
+        const csrftoken = Cookies.get('csrftoken');
+        document.addEventListener('DOMContentLoaded', (event) => {
+          const url = '{% url "blog:like" %}';
+      
+          var options = {
+            method: 'POST',
+            headers: {'X-CSRFToken': csrftoken},
+            mode: 'same-origin'
+          }
 
+          document.querySelector('a.like')
+            .addEventListener('click', function(e){
+            e.preventDefault();
+            var likeButton = this;
 
+            // add request body
+            var formData = new FormData();
+            formData.append('id', likeButton.dataset.id);
+            formData.append('action', likeButton.dataset.action);
+            options['body'] = formData;
 
+            // send HTTP request
+            fetch(url, options)
+              .then(response => response.json())
+              .then(data => {
+            if (data['status'] === 'ok')
+            {
+              var previousAction = likeButton.dataset.action;
 
+            // toggle button text and data-action
+            var action = previousAction === 'like' ? 'unlike' : 'like';
+            likeButton.dataset.action = action;
+            likeButton.innerHTML = action;
 
-
-
+            // update like count
+            var likeCount = document.querySelector('span.count .total');
+            var totalLikes = parseInt(likeCount.innerHTML);
+            likeCount.innerHTML = previousAction === 'like' ? totalLikes + 1 : totalLikes - 1;
+            }
+          })
+        });
+        })
+      </script>
