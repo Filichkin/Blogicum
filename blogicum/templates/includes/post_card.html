@@ -46,8 +46,9 @@
 <script src="//cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js"></script>
       <script>
         const csrftoken = Cookies.get('csrftoken');
-        document.addEventListener('DOMContentLoaded', (event) => {
+        document.addEventListener('DOMContentLoaded', function () {
           const url = '{% url "blog:like" %}';
+          const likeButtons = document.querySelectorAll('a.like');
       
           var options = {
             method: 'POST',
@@ -55,35 +56,35 @@
             mode: 'same-origin'
           }
 
-          document.querySelector('a.like')
-            .addEventListener('click', function(e){
+          likeButtons.forEach(function (likeButton) {
+        likeButton.addEventListener('click', function (e) {
             e.preventDefault();
             var likeButton = this;
-
-            // add request body
             var formData = new FormData();
             formData.append('id', likeButton.dataset.id);
             formData.append('action', likeButton.dataset.action);
             options['body'] = formData;
 
-            // send HTTP request
             fetch(url, options)
-              .then(response => response.json())
-              .then(data => {
-            if (data['status'] === 'ok')
-            {
-              var previousAction = likeButton.dataset.action;
+                .then(response => response.json())
+                .then(data => {
+                    if (data['status'] === 'ok') {
+                        var previousAction = likeButton.dataset.action;
 
-            // toggle button text and data-action
-            var action = previousAction === 'like' ? 'unlike' : 'like';
-            likeButton.dataset.action = action;
-            likeButton.innerHTML = action;
+                        var action = previousAction === 'like' ? 'unlike' : 'like';
+                        likeButton.dataset.action = action;
+                        likeButton.innerHTML = action;
 
-            // update like count
-            var likeCount = document.querySelector('span.count .total');
-            var totalLikes = parseInt(likeCount.innerHTML);
-            likeCount.innerHTML = previousAction === 'like' ? totalLikes + 1 : totalLikes - 1;
-            }
+                        var likeCount = document.querySelector('span.count .total');
+                        var totalLikes = parseInt(likeCount.innerHTML);
+                        likeCount.innerHTML = previousAction === 'like' ? totalLikes + 1 : totalLikes - 1;
+
+                        location.reload();
+                    }
+                })
+                .catch(error => {
+                    console.error('Fetch error:', error);
+                });
           })
         });
         })
