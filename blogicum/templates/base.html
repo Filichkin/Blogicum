@@ -26,14 +26,7 @@
     {% include "includes/footer.html" %}
 
     <script src="//cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js"></script>
-      <script>
-        const csrftoken = Cookies.get('csrftoken');
-        document.addEventListener('DOMContentLoaded', (event) => {
-          {% block domready %}
-          {% endblock %}
-        })
-      </script>
-
+    <script src="{% static 'js/likeButton.js' %}" defer></script>
 
   </body>
 </html>
