@@ -1,7 +1,8 @@
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', function() {
     const csrftoken = Cookies.get('csrftoken');
-    const url = '{% url "blog:like" %}';
     const likeButtons = document.querySelectorAll('a.like');
+    const url = likeButtons[0].dataset.url;
+    
 
     var options = {
       method: 'POST',
@@ -9,7 +10,7 @@ document.addEventListener('DOMContentLoaded', function () {
       mode: 'same-origin'
     }
 
-    likeButtons.forEach(function (likeButton) {
+    likeButtons.forEach(function(likeButton) {
     likeButton.addEventListener('click', function (e) {
       e.preventDefault();
       var likeButton = this;
@@ -17,22 +18,21 @@ document.addEventListener('DOMContentLoaded', function () {
       formData.append('id', likeButton.dataset.id);
       formData.append('action', likeButton.dataset.action);
       options['body'] = formData;
-
-      fetch(url, options)
+      var postId = this.getAttribute('data-id');
+      var likeCountElement = document.getElementById(postId);
+     
+      fetch(url, options, postId)
           .then(response => response.json())
           .then(data => {
               if (data['status'] === 'ok') {
                   var previousAction = likeButton.dataset.action;
-
                   var action = previousAction === 'like' ? 'unlike' : 'like';
                   likeButton.dataset.action = action;
                   likeButton.innerHTML = action;
 
-                  var likeCount = document.querySelector('span.count .total');
-                  var totalLikes = parseInt(likeCount.innerHTML);
-                  likeCount.innerHTML = previousAction === 'like' ? totalLikes + 1 : totalLikes - 1;
-
-                  location.reload();
+                  var likeCount = likeCountElement.textContent;
+                  var totalLikes = parseInt(likeCount);
+                  likeCountElement.textContent = previousAction === 'like' ? totalLikes + 1 : totalLikes - 1;
               }
           })
           .catch(error => {

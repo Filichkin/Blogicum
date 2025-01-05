@@ -24,11 +24,11 @@
       <a href="{% url 'blog:post_detail' post.id %}" class="card-link text-muted">Комментарии ({{ post.comment_count }})</a>
       
       {% with total_likes=post.users_like.count users_like=post.users_like.all %}
-      <div>
-        <span class="count">
-        <span id="{{ post.id }}" >{{ total_likes }}</span>
-        like{{ total_likes|pluralize }}
-        </span>
+        <div>
+          <span class="count">
+          <span class="total">{{ total_likes }}</span>
+          like{{ total_likes|pluralize }}
+          </span>
           {% if request.user.is_authenticated %}
             <a 
             href="javascript:void(0);" 
@@ -38,13 +38,13 @@
             class="like button"
             >
             {% if request.user not in users_like %}
-              like
+              Like
             {% else %}
-              unlike
+              Unlike
             {% endif %}
             </a>
           {% endif %}
-      </div>
+        </div>
       {% endwith %}
     </div>
   </div>

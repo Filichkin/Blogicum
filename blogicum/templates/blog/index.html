@@ -1,12 +1,15 @@
 {% extends "base.html" %}
+
 {% block title %}
   Лента записей
 {% endblock %}
 {% block content %}
+{% load static %}
   {% for post in page_obj %}
     <article class="mb-5">
       {% include "includes/post_card.html" %}
     </article>
   {% endfor %}
+  <script src="{% static 'js/likeButton.js' %}" defer></script>
   {% include "includes/paginator.html" %}
 {% endblock %}
