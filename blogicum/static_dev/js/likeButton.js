@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', function() {
     const csrftoken = Cookies.get('csrftoken');
-    const likeButtons = document.querySelectorAll('a.like');
+    const likeButtons = document.querySelectorAll('a.btn-light');
     const url = likeButtons[0].dataset.url;
     
 
