@@ -29,6 +29,8 @@ document.addEventListener('DOMContentLoaded', function() {
                   var action = previousAction === 'like' ? 'unlike' : 'like';
                   likeButton.dataset.action = action;
                   likeButton.innerHTML = action;
+                  likeButton.text = (previousAction == 'like' ? '👎' : '👍');
+                  
 
                   var likeCount = likeCountElement.textContent;
                   var totalLikes = parseInt(likeCount);
