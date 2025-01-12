@@ -128,6 +128,11 @@ class Comment(models.Model):
         verbose_name='Текст'
     )
     created_at = models.DateTimeField(auto_now_add=True)
+    users_like = models.ManyToManyField(
+        User,
+        related_name='comments_liked',
+        blank=True
+    )
 
     class Meta:
         ordering = ['created_at']

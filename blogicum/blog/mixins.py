@@ -1,5 +1,6 @@
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.core.exceptions import PermissionDenied
+from django.http import HttpResponseBadRequest
 
 from .models import Comment
 
@@ -21,4 +22,12 @@ class CommentMixin(LoginRequiredMixin):
             raise PermissionDenied(
                 'Вы не авторизованы для удаления этого комментария.'
             )
+        return super().dispatch(request, *args, **kwargs)
+
+
+class AjaxRequiredMixin:
+
+    def dispatch(self, request, *args, **kwargs):
+        if not request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest':
+                return HttpResponseBadRequest()
         return super().dispatch(request, *args, **kwargs)
