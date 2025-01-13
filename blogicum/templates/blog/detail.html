@@ -4,6 +4,7 @@
   {{ post.pub_date|date:"d E Y" }}
 {% endblock %}
 {% block content %}
+{% load static %}
   <div class="col d-flex justify-content-center">
     <div class="card" style="width: 40rem;">
       <div class="card-body">
@@ -38,7 +39,7 @@
           </div>
         {% endif %}
         {% include "includes/comments.html" %}
-        <script src="{% static 'js/commentlikeButton.js' %}" defer></script>
+        <script src="{% static 'js/likeButton.js' %}" defer></script>
       </div>
     </div>
   </div>
