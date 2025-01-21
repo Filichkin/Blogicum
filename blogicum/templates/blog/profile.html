@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load static %}
 {% block title %}
   Страница пользователя {{ profile.username }}
 {% endblock %}
@@ -24,5 +25,6 @@
       {% include "includes/post_card.html" %}
     </article>
   {% endfor %}
+  <script src="{% static 'js/likeButton.js' %}" defer></script>
   {% include "includes/paginator.html" %}
 {% endblock %}

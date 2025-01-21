@@ -22,7 +22,6 @@
       <p class="card-text">{{ post.text|truncatewords:10 }}</p>
       <a href="{% url 'blog:post_detail' post.id %}" class="card-link">Читать полный текст</a>
       <a href="{% url 'blog:post_detail' post.id %}" class="card-link text-muted">Комментарии ({{ post.comment_count }})</a>
-      
       {% with total_likes=post.users_like.count users_like=post.users_like.all %}
       <div>
           {% if request.user.is_authenticated %}
