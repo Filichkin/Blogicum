@@ -6,12 +6,11 @@ from django.http import Http404, JsonResponse
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
 from django.urls import reverse_lazy, reverse
-from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
 
 from .constants import MAX_POSTS
 from .forms import CommentForm, PostForm, UserProfileForm
-from .mixins import CommentMixin, OnlyAuthorMixin, AjaxRequiredMixin
+from .mixins import CommentMixin, OnlyAuthorMixin
 from .models import Post, Category, Comment
 from .utils import get_user, get_user_posts, posts_queryset
 
@@ -186,6 +185,40 @@ class EditProfileView(LoginRequiredMixin, UpdateView):
         return self.request.user
 
 
+class PostLike(View):
+    def post(self, request, *args, **kwargs):
+        post_id = request.POST.get('id')
+        action = request.POST.get('action')
+        if post_id and action:
+            try:
+                post = Post.objects.get(id=post_id)
+                if action == 'like':
+                    post.users_like.add(request.user)
+                else:
+                    post.users_like.remove(request.user)
+                return JsonResponse({'status': 'ok'})
+            except Post.DoesNotExist:
+                pass
+        return JsonResponse({'status': 'error'})
+
+'''
+class CommentLike(DetailView):
+    def comment(self, request, *args, **kwargs):
+        comment_id = request.POST.get('id')
+        action = request.POST.get('action')
+        if comment_id and action:
+            try:
+                comment = Comment.objects.get(id=comment_id)
+                if action == 'like':
+                    comment.users_like.add(request.user)
+                else:
+                    comment.users_like.remove(request.user)
+                return JsonResponse({'status': 'ok'})
+            except Post.DoesNotExist:
+                pass
+        return JsonResponse({'status': 'error'})
+'''
+'''
 @require_POST
 def post_like(request):
     post_id = request.POST.get('id')
@@ -201,6 +234,7 @@ def post_like(request):
         except Post.DoesNotExist:
             pass
     return JsonResponse({'status': 'error'})
+'''
 
 
 @require_POST

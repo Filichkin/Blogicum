@@ -54,8 +54,17 @@ urlpatterns = [
     ),
     path(
         'posts/<int:post_id>/delete_comment/<comment_id>/',
-        views.DeleteCommentView.as_view(), name='delete_comment'
+        views.DeleteCommentView.as_view(),
+        name='delete_comment'
     ),
-    path('posts/like/', views.post_like, name='like'),
-    path('posts/like_comment/', views.comment_like, name='comment_like')
+    path(
+        'posts/like/',
+        views.PostLike.as_view(),
+        name='like'
+    ),
+    path(
+        'posts/like_comment/',
+        views.comment_like,
+        name='comment_like'
+    )
 ]
