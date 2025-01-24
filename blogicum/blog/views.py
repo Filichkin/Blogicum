@@ -7,11 +7,12 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
 from django.urls import reverse_lazy, reverse
 from django.views.decorators.http import require_POST
+from django.contrib.auth.decorators import login_required
 
 from .constants import MAX_POSTS
 from .forms import CommentForm, PostForm, UserProfileForm
 from .mixins import CommentMixin, OnlyAuthorMixin
-from .models import Post, Category, Comment
+from .models import Post, Category, Comment, Contact
 from .utils import get_user, get_user_posts, posts_queryset
 
 
@@ -201,6 +202,48 @@ class PostLike(View):
                 pass
         return JsonResponse({'status': 'error'})
 
+
+@require_POST
+def comment_like(request):
+    comment_id = request.POST.get('id')
+    action = request.POST.get('action')
+    if comment_id and action:
+        try:
+            comment = Comment.objects.get(id=comment_id)
+            if action == 'like':
+                comment.users_like.add(request.user)
+            else:
+                comment.users_like.remove(request.user)
+            return JsonResponse({'status': 'ok'})
+        except Post.DoesNotExist:
+            pass
+    return JsonResponse({'status': 'error'})
+
+
+@require_POST
+@login_required
+def user_follow(request):
+    user_id = request.POST.get('id')
+    action = request.POST.get('action')
+    if user_id and action:
+        try:
+            user = User.objects.get(id=user_id)
+            if action == 'follow':
+                Contact.objects.get_or_create(
+                    user_from=request.user,
+                    user_to=user
+                )
+            else:
+                Contact.objects.filter(
+                    user_from=request.user,
+                    user_to=user
+                ).delete()
+            return JsonResponse({'status': 'ok'})
+        except User.DoesNotExist:
+            return JsonResponse({'status': 'error'})
+    return JsonResponse({'status': 'error'})
+
+
 '''
 class CommentLike(DetailView):
     def comment(self, request, *args, **kwargs):
@@ -235,24 +278,6 @@ def post_like(request):
             pass
     return JsonResponse({'status': 'error'})
 '''
-
-
-@require_POST
-def comment_like(request):
-    comment_id = request.POST.get('id')
-    action = request.POST.get('action')
-    if comment_id and action:
-        try:
-            comment = Comment.objects.get(id=comment_id)
-            if action == 'like':
-                comment.users_like.add(request.user)
-            else:
-                comment.users_like.remove(request.user)
-            return JsonResponse({'status': 'ok'})
-        except Post.DoesNotExist:
-            pass
-    return JsonResponse({'status': 'error'})
-
 
 '''
 class PostLikeView(LoginRequiredMixin, AjaxRequiredMixin, View):

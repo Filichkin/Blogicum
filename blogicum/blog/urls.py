@@ -28,6 +28,11 @@ urlpatterns = [
         name='category_posts'
     ),
     path(
+        'profile/follow/',
+        views.user_follow,
+        name='user_follow'
+    ),
+    path(
         'profile/<str:username>/',
         views.ProfileView.as_view(),
         name='profile'
