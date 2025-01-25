@@ -11,7 +11,7 @@
       <li class="list-group-item text-muted">Регистрация: {{ profile.date_joined }}</li>
       <li class="list-group-item text-muted">Роль: {% if profile.is_staff %}Админ{% else %}Пользователь{% endif %}</li>
     </ul>
-    {% with total_followers=user.followers.count %}
+    {% with total_followers=profile.followers.count %}
     <div class="col d-flex justify-content-center">
       <div class="card" style="width: 44rem;">
         <div class="card-body">
@@ -20,11 +20,11 @@
             follower{{ total_followers|pluralize }}
           </span>
             <a href="javascript:void(0);" 
-               data-id="{{ user.id }}" 
-               data-action="{% if request.user in user.followers.all %}un{% endif %}follow"
+               data-id="{{ profile.id }}" 
+               data-action="{% if request.user in profile.followers.all %}un{% endif %}follow"
                data-url="{% url 'blog:user_follow' %}" 
                class="follow button">
-            {% if request.user not in user.followers.all %}
+            {% if request.user not in profile.followers.all %}
             Follow
             {% else %}
             Unfollow
