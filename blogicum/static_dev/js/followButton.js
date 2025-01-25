@@ -5,7 +5,7 @@ var options = {
     mode: 'same-origin'
 }
 
-  document.querySelector('a.follow')
+  document.querySelector('a.btn-outline-secondary')
           .addEventListener('click', function(e){
     e.preventDefault();
     var followButton = this;
@@ -31,7 +31,7 @@ var options = {
         followButton.innerHTML = action;
         
         // update follower count
-        var followerCount = document.querySelector('span.count .total');
+        var followerCount = document.querySelector('span.btn-outline-secondary .total');
         var totalFollowers = parseInt(followerCount.innerHTML);
         followerCount.innerHTML = previousAction === 'follow' ? totalFollowers
 + 1 : totalFollowers - 1;

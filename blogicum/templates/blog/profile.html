@@ -15,7 +15,7 @@
     <div class="col d-flex justify-content-center">
       <div class="card" style="width: 44rem;">
         <div class="card-body">
-          <span class="count">
+          <span class="btn btn-outline-secondary">
           <span class="total">{{ total_followers }}</span>
             follower{{ total_followers|pluralize }}
           </span>
@@ -23,7 +23,7 @@
                data-id="{{ profile.id }}" 
                data-action="{% if request.user in profile.followers.all %}un{% endif %}follow"
                data-url="{% url 'blog:user_follow' %}" 
-               class="follow button">
+               class="btn btn-outline-secondary">
             {% if request.user not in profile.followers.all %}
             Follow
             {% else %}
