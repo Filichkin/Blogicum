@@ -99,8 +99,13 @@ class Post(PublishedModel):
         related_name='posts_liked',
         blank=True
     )
+    total_likes = models.PositiveIntegerField(default=0)
 
     class Meta:
+        indexes = [
+            models.Index(fields=['-pub_date']),
+            models.Index(fields=['-total_likes']),
+        ]
         ordering = ['-pub_date']
         verbose_name = 'публикация'
         verbose_name_plural = 'Публикации'
@@ -132,8 +137,13 @@ class Comment(models.Model):
         related_name='comments_liked',
         blank=True
     )
+    total_likes = models.PositiveIntegerField(default=0)
 
     class Meta:
+        indexes = [
+            models.Index(fields=['created_at']),
+            models.Index(fields=['-total_likes']),
+        ]
         ordering = ['created_at']
         verbose_name = 'комментарий'
         verbose_name_plural = 'Комментарии'
