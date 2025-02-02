@@ -23,7 +23,9 @@ ALLOWED_HOSTS = [
 INTERNAL_IPS = [
     '127.0.0.1',
 ]
-
+REDIS_HOST = 'localhost'
+REDIS_PORT = 6379
+REDIS_DB = 1
 # Application definition
 
 INSTALLED_APPS = [
@@ -36,7 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_bootstrap5',
-    'debug_toolbar'
+    'debug_toolbar',
 ]
 
 MIDDLEWARE = [

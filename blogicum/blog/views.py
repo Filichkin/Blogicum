@@ -3,17 +3,27 @@ from django.views.generic import ListView, CreateView
 from django.views.generic import UpdateView, DeleteView, DetailView
 from django.shortcuts import get_object_or_404, redirect
 from django.http import Http404, JsonResponse
+from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
 from django.urls import reverse_lazy, reverse
 from django.views.decorators.http import require_POST
 from django.contrib.auth.decorators import login_required
 
+import redis
+
 from .constants import MAX_POSTS
 from .forms import CommentForm, PostForm, UserProfileForm
 from .mixins import CommentMixin, OnlyAuthorMixin
 from .models import Post, Category, Comment, Contact
 from .utils import get_user, get_user_posts, posts_queryset
+
+
+REDIS = redis.Redis(
+    host=settings.REDIS_HOST,
+    port=settings.REDIS_PORT,
+    db=settings.REDIS_DB
+)
 
 
 class PostListView(ListView):
@@ -91,9 +101,11 @@ class PostDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         post = self.get_object()
+        total_views = REDIS.incr(f'post:{post.id}:views')
         comments = post.comments.all().order_by('created_at')
         context['form'] = CommentForm()
         context['comments'] = comments
+        context['total_views'] = total_views
         return context
 
 

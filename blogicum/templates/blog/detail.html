@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load views_extras %}
 {% block title %}
   {{ post.title }} | {% if post.location and post.location.is_published %}{{ post.location.name }}{% else %}Планета Земля{% endif %} |
   {{ post.pub_date|date:"d E Y" }}
@@ -38,6 +39,9 @@
             </a>
           </div>
         {% endif %}
+        <span class="btn btn-light">
+          {{ total_views }} {{ total_views|ru_plural:"просмотр,просмотра,просмотров" }}
+        </span>
         {% include "includes/comments.html" %}
         <script src="{% static 'js/likeButton.js' %}" defer></script>
       </div>
