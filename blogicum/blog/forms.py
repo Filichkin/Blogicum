@@ -20,7 +20,7 @@ class PostForm(forms.ModelForm):
 
     class Meta:
         model = Post
-        exclude = ['author', 'users_like']
+        exclude = ['author', 'users_like', 'total_likes']
         widgets = {
             'pub_date': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
         }
